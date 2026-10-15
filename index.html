@@ -1,0 +1,357 @@
+
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SIAP UJI - Cerita tentang Indonesia Kita</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#edf4ff;color:#20334c}
+header{background:linear-gradient(120deg,#8b1725,#d74636);color:white;text-align:center;padding:24px 14px}
+header h1{margin:10px 0;font-size:30px}
+main{max-width:950px;margin:22px auto;padding:0 14px}
+.card{background:white;border-radius:16px;padding:22px;margin-bottom:18px;box-shadow:0 5px 20px #182c4512}
+h2{color:#a3212d}
+input[type=password],select,input[type=text],textarea{width:100%;padding:12px;border:1px solid #cbd5e1;border-radius:9px;font-size:15px}
+label{display:block;margin:10px 0}
+button{padding:12px 16px;border:0;border-radius:9px;background:#b42332;color:white;font-weight:bold;cursor:pointer;margin:5px 3px}
+button:hover{opacity:.88}
+.option{display:flex;gap:10px;padding:10px;background:#f3f6fb;border-radius:8px}
+.option input{margin-top:4px}
+.question{padding:15px;margin:14px 0;border:1px solid #dce5ef;border-radius:12px}
+.question h3{font-size:16px;line-height:1.5}
+.small{font-size:13px;color:#61748b;line-height:1.6}
+.notice{background:#fff5d8;border-left:4px solid #e9ae30;padding:12px;line-height:1.6}
+.hidden{display:none}
+.progress{height:9px;background:#dbe5f1;border-radius:10px;overflow:hidden}
+#bar{height:100%;width:0;background:#27975e}
+.score{font-size:42px;color:#198754;font-weight:bold}
+footer{text-align:center;padding:20px;color:#64748b;font-size:12px}
+</style>
+</head>
+<body>
+<header>
+<div>🇮🇩 GAME EDUKATIF • KELAS VI</div>
+<h1>SIAP UJI</h1>
+<h3>Petualangan Sejarah Indonesia</h3>
+<p>SD Negeri Denanyar 1</p>
+<p>Bab 2: Cerita tentang Indonesia Kita</p>
+</header>
+
+<main>
+<section id="login" class="card">
+<h2>🚩 Login Peserta Didik</h2>
+<p>Pilih nama dan masukkan NIPD sebagai kata sandi.</p>
+<label>Nama peserta didik
+<select id="nama"><option value="">-- Pilih nama --</option></select>
+</label>
+<label>NIPD / Kata sandi
+<input type="password" id="nipd" placeholder="Masukkan NIPD">
+</label>
+<p id="error" style="color:#c62828"></p>
+<button onclick="masuk()">Mulai Petualangan</button>
+<div class="notice">
+<b>Petunjuk permainan</b><br>
+1. Pilihan ganda: pilih satu jawaban.<br>
+2. Pilihan ganda kompleks: pilih semua jawaban yang benar.<br>
+3. Menjodohkan: pilih pasangan yang sesuai.<br>
+4. Isian singkat dan uraian: tuliskan jawaban sendiri.<br>
+5. Selesaikan semua soal, kemudian lihat hasil ujian.
+</div>
+<p class="small">Versi HTML mandiri. Email hasil akan disiapkan melalui aplikasi email; pengiriman tetap perlu dikonfirmasi dengan menekan tombol Kirim.</p>
+</section>
+
+<section id="ujian" class="card hidden">
+<h2>🏆 Arena Petualangan Sejarah</h2>
+<p id="identitas"></p>
+<div class="notice">Terus semangat! Bacalah setiap pertanyaan dengan teliti.</div>
+<p class="small">Terjawab: <span id="jumlah">0</span>/40</p>
+<div class="progress"><div id="bar"></div></div>
+<div id="soal"></div>
+<button onclick="selesai()">Selesaikan Ujian</button>
+</section>
+
+<section id="hasil" class="card hidden">
+<h2>🎉 Petualangan Selesai!</h2>
+<p id="identitasHasil"></p>
+<div class="score" id="nilai"></div>
+<div id="rincian"></div>
+<div class="notice">Skor otomatis dihitung dari 25 soal objektif. Isian singkat dan uraian perlu diperiksa guru.</div>
+<button onclick="email()">📧 Kirim Hasil ke Guru</button>
+<button onclick="rekap()">Lihat Rekap Jawaban</button>
+<div id="status" class="small"></div>
+<div id="daftarRekap" class="hidden"></div>
+</section>
+</main>
+<footer>SIAP UJI • SD Negeri Denanyar 1 • IPAS Kelas VI</footer>
+
+<script>
+const siswa=[
+["ABID ALVARO GAVRIEL","2759"],
+["AFFIN CHARLISA ACHYARNIS","2760"],
+["ALBY FAREL AXEL FAIRUS","2761"],
+["ANGGRAITA DARA KUSUMANINGRUM","2762"],
+["ARGA ADAM ALFATIR","2763"],
+["ARIF AZHARI SETIAWAN","2764"],
+["AZIZ SATRIO PRAMBUDI","2765"],
+["AZKA KHOIRUNNISA","2766"],
+["BILQIS ZAHIRA ALYA AZIZA","2820"],
+["DANIEL IRKHAM YUNIANTO","2767"],
+["DELTA DANIES WICAKSONO","2768"],
+["ELVINA NOVITA SARI","2769"],
+["FATIN DESTIANA SHIDQIA","2770"],
+["IAN THU ALFIAN","2771"],
+["KHALISA ZAHRA RAMADHANI","2772"],
+["LABIBAH ANINDYA JIHAN TALITA ULFA","2774"],
+["MAYDA NURUL AZKIA","2775"],
+["MUHAMMAD AMIRRUDIN","2776"],
+["MUHAMMAD EZA HAFIZ ADITIYA","2777"],
+["MUHAMMAD RIFKY CAHYO SAPUTRO","2778"],
+["NURIYA JANNATUN NAIM","2779"],
+["PRABU AHMAD AHNAFI","2780"],
+["QEYLA ABSHARI FIRDA RAHMADANI","2848"],
+["RAHMAT MAULANA","2781"],
+["RAVA'EL DWI VANDIMAS","2782"],
+["RAVE'AL DIMAS PRAYOGA","2783"],
+["RISMACERLYN NUR ISKANDAR","2784"],
+["SAMUEL DESWA ANGGARA","2785"],
+["VAHDIL ASKA HARIANSYAH","2824"]
+];
+
+const Q=[];
+function add(t,q,o,a,p=""){Q.push({t,q,o,a,p})}
+
+// 1-15 PILIHAN GANDA
+[
+["Salah satu tujuan utama bangsa Eropa datang ke Nusantara pada awalnya adalah ...",["Mencari rempah-rempah","Mendirikan sekolah modern","Membangun bandara","Mengadakan pemilu"],0],
+["Bangsa Eropa yang pertama kali tiba di Malaka pada 1511 dipimpin oleh ...",["Cornelis de Houtman","Alfonso de Albuquerque","Daendels","Van den Bosch"],1],
+["VOC didirikan oleh Belanda pada tahun ...",["1511","1596","1602","1945"],2],
+["Kolonialisme adalah tindakan ...",["Menguasai wilayah dan penduduk lain","Bekerja sama secara setara","Melakukan pertukaran budaya saja","Mengadakan perlombaan"],0],
+["Imperialisme berkaitan dengan ...",["Perluasan kekuasaan atas bangsa atau wilayah lain","Kegiatan belajar di sekolah","Pemilihan ketua kelas","Perdagangan tanpa tujuan kekuasaan"],0],
+["Salah satu dampak penjajahan bagi rakyat Indonesia adalah ...",["Eksploitasi sumber daya dan penderitaan rakyat","Semua rakyat menjadi sejahtera","Tidak ada perubahan kehidupan","Semua pajak dihapus"],0],
+["Perang Diponegoro berlangsung pada tahun ...",["1800–1805","1825–1830","1908–1912","1942–1945"],1],
+["Salah satu penyebab Perang Diponegoro adalah ...",["Pemasangan patok jalan yang melewati tanah leluhur Diponegoro","Pembentukan ASEAN","Peristiwa Rengasdengklok","Pendirian BPUPKI"],0],
+["Perang Padri terjadi terutama di wilayah ...",["Sumatra Barat","Kalimantan Selatan","Bali","Papua"],0],
+["Tokoh yang terkenal dalam Perang Padri adalah ...",["Tuanku Imam Bonjol","Pattimura","Sultan Hasanuddin","Ki Hajar Dewantara"],0],
+["Organisasi Budi Utomo berdiri pada tahun ...",["1602","1825","1908","1928"],2],
+["Sumpah Pemuda diikrarkan pada tanggal ...",["20 Mei 1908","28 Oktober 1928","17 Agustus 1945","10 November 1945"],1],
+["Makna penting Sumpah Pemuda adalah ...",["Memperkuat persatuan bangsa","Membagi Indonesia menjadi kerajaan kecil","Mengakhiri pendidikan","Mendukung penjajahan"],0],
+["Peristiwa Rengasdengklok berkaitan dengan ...",["Desakan agar proklamasi segera dilaksanakan","Awal Perang Diponegoro","Pendirian VOC","Lahirnya Budi Utomo"],0],
+["Proklamasi Kemerdekaan Indonesia dibacakan pada ...",["1 Juni 1945","17 Agustus 1945","18 Agustus 1945","28 Oktober 1928"],1]
+].forEach(x=>add("pg",x[0],x[1],x[2]));
+
+// 16-20 PILIHAN GANDA KOMPLEKS
+[
+["Pilih semua alasan bangsa Eropa datang ke Nusantara.",["Mencari rempah-rempah","Mencari jalur perdagangan","Memperluas pengaruh dan kekuasaan","Membantu Indonesia menyelenggarakan pemilu"],[0,1,2]],
+["Pilih pernyataan yang tepat tentang perlawanan kedaerahan.",["Dipimpin tokoh daerah","Memiliki semangat melawan penjajah","Sering menghadapi keterbatasan koordinasi antardaerah","Selalu berlangsung serentak di seluruh Indonesia"],[0,1,2]],
+["Pilih organisasi atau peristiwa yang berhubungan dengan kebangkitan nasional.",["Budi Utomo","Sumpah Pemuda","Pergerakan organisasi modern","Pendirian VOC pada 1602 sebagai organisasi nasional Indonesia"],[0,1,2]],
+["Pilih pernyataan yang benar tentang Sumpah Pemuda.",["Mengakui satu tanah air, Indonesia","Mengakui satu bangsa, Indonesia","Menjunjung bahasa persatuan, bahasa Indonesia","Mengajarkan setiap daerah harus terpisah"],[0,1,2]],
+["Pilih peristiwa yang berhubungan dengan persiapan kemerdekaan Indonesia.",["Peristiwa Rengasdengklok","Perumusan teks proklamasi","Pembacaan proklamasi 17 Agustus 1945","Pendirian VOC"],[0,1,2]]
+].forEach(x=>add("pgk",x[0],x[1],x[2]));
+
+// 21-25 MENJODOHKAN
+[
+["Pasangkan tokoh dengan peristiwa atau perjuangannya.",[
+["Pangeran Diponegoro","Perang Diponegoro"],
+["Tuanku Imam Bonjol","Perang Padri"],
+[" dr. Soetomo","Budi Utomo"],
+["Soekarno","Pembacaan teks proklamasi"],
+["Mohammad Yamin","Tokoh pergerakan nasional dan Sumpah Pemuda"]
+]],
+["Pasangkan istilah dengan pengertiannya.",[
+["Kolonialisme","Penguasaan wilayah oleh bangsa lain"],
+["Imperialisme","Perluasan kekuasaan"],
+["VOC","Kongsi dagang Belanda"],
+["Pergerakan nasional","Perjuangan melalui organisasi untuk kemajuan bangsa"],
+["Proklamasi","Pernyataan kemerdekaan"]
+]],
+["Pasangkan peristiwa dengan tahunnya.",[
+["VOC didirikan","1602"],
+["Perang Diponegoro dimulai","1825"],
+["Budi Utomo berdiri","1908"],
+["Sumpah Pemuda","1928"],
+["Proklamasi Indonesia","1945"]
+]],
+["Pasangkan peristiwa dengan maknanya.",[
+["Sumpah Pemuda","Memperkuat persatuan pemuda"],
+["Perang Diponegoro","Perlawanan terhadap penjajahan"],
+["Budi Utomo","Perkembangan organisasi modern"],
+["Rengasdengklok","Mendorong percepatan proklamasi"],
+["Proklamasi","Pernyataan kemerdekaan bangsa"]
+]],
+["Pasangkan tempat dengan peristiwa yang berkaitan.",[
+["Rengasdengklok","Peristiwa menjelang proklamasi"],
+["Jakarta","Pembacaan proklamasi"],
+["Sumatra Barat","Perang Padri"],
+["Yogyakarta dan Jawa Tengah","Wilayah penting Perang Diponegoro"],
+["Batavia","Pusat pemerintahan kolonial Belanda pada masa tertentu"]
+]]
+].forEach(x=>add("match",x[0],x[1],x[1].map((_,i)=>i)));
+
+// 26-35 ISIAN SINGKAT
+[
+["Komoditas yang sangat dicari bangsa Eropa dari Nusantara adalah ...",["rempah-rempah","rempah"]],
+["Kongsi dagang Belanda yang berdiri pada 1602 bernama ...",["voc","vereinigde oostindische compagnie"]],
+["Penguasaan wilayah bangsa lain disebut ...",["kolonialisme"]],
+["Perluasan kekuasaan atas bangsa atau wilayah lain disebut ...",["imperialisme"]],
+["Pemimpin Perang Diponegoro adalah ...",["pangeran diponegoro","diponegoro"]],
+["Tokoh utama yang dikenal dalam Perang Padri adalah ...",["tuanku imam bonjol","imam bonjol"]],
+["Organisasi yang berdiri pada 20 Mei 1908 adalah ...",["budi utomo"]],
+["Ikrar persatuan pemuda pada 28 Oktober 1928 dikenal sebagai ...",["sumpah pemuda"]],
+["Peristiwa penculikan sementara Soekarno-Hatta oleh golongan muda menjelang kemerdekaan dikenal sebagai Peristiwa ...",["rengasdengklok"]],
+["Indonesia memproklamasikan kemerdekaan pada tanggal 17 Agustus tahun ...",["1945"]]
+].forEach(x=>add("isian",x[0],[],x[1]));
+
+// 36-40 URAIAN
+[
+["Jelaskan dua tujuan kedatangan bangsa Eropa ke Nusantara dan dua dampaknya bagi rakyat Indonesia.",
+"Tujuan antara lain mencari rempah-rempah, berdagang, dan memperluas kekuasaan. Dampak antara lain eksploitasi sumber daya, kerja paksa di masa tertentu, serta perubahan kehidupan sosial dan ekonomi."],
+["Bandingkan Perang Diponegoro dan Perang Padri. Sebutkan tokoh dan salah satu ciri perjuangannya.",
+"Perang Diponegoro dipimpin Pangeran Diponegoro pada 1825–1830. Perang Padri melibatkan Tuanku Imam Bonjol dan berlangsung di Sumatra Barat. Keduanya merupakan perjuangan melawan kekuasaan kolonial, meskipun latar belakang dan perkembangannya berbeda."],
+["Mengapa lahirnya pergerakan nasional dan Sumpah Pemuda menjadi titik penting perjuangan Indonesia?",
+"Perjuangan berkembang melalui organisasi, pendidikan, gagasan kebangsaan, dan persatuan lintas daerah. Sumpah Pemuda menegaskan satu tanah air, satu bangsa, dan bahasa persatuan."],
+["Ceritakan secara berurutan beberapa peristiwa penting menjelang Proklamasi Kemerdekaan Indonesia.",
+"Jawaban dapat memuat kekalahan Jepang, perbedaan pendapat golongan muda dan tua, Peristiwa Rengasdengklok, perumusan teks proklamasi, dan pembacaan proklamasi pada 17 Agustus 1945."],
+["Bagaimana cara meneladani semangat para pahlawan dalam kehidupan sekolah? Berikan minimal tiga contoh.",
+"Contoh: belajar tekun, bekerja sama, menghargai perbedaan, berani membela kebenaran, disiplin, dan mengutamakan kepentingan bersama."]
+].forEach(x=>add("uraian",x[0],[],[],x[1]));
+
+let peserta=null,laporan="",selesaiUjian=false;
+const $=id=>document.getElementById(id);
+siswa.forEach(s=>{
+ let o=document.createElement("option");
+ o.value=s[0];o.textContent=s[0];$("nama").appendChild(o);
+});
+
+function masuk(){
+ let n=$("nama").value,p=$("nipd").value.trim();
+ peserta=siswa.find(s=>s[0]===n&&s[1]===p);
+ if(!peserta){$("error").textContent="Nama atau NIPD tidak sesuai.";return}
+ $("login").classList.add("hidden");
+ $("ujian").classList.remove("hidden");
+ $("identitas").textContent="Nama: "+peserta[0]+" | NIPD: "+peserta[1];
+ gambarSoal();
+ window.scrollTo(0,0);
+}
+
+function gambarSoal(){
+ let root=$("soal");
+ root.innerHTML="";
+ let judul={pg:"Pilihan Ganda",pgk:"Pilihan Ganda Kompleks",match:"Menjodohkan",isian:"Isian Singkat",uraian:"Uraian"};
+ Q.forEach((s,i)=>{
+  let d=document.createElement("div");
+  d.className="question";
+  let h=`<div class="small">${judul[s.t]} • Soal ${i+1}</div><h3>${i+1}. ${s.q}</h3>`;
+  if(s.t==="pg"||s.t==="pgk"){
+   h+=s.o.map((v,j)=>`<label class="option"><input type="${s.t==="pg"?"radio":"checkbox"}" name="q${i}" value="${j}"><span>${String.fromCharCode(65+j)}. ${v}</span></label>`).join("");
+  }else if(s.t==="match"){
+   // Urutan pilihan diacak per soal agar peserta benar-benar memasangkan.
+   const opsi=s.a.map((_,j)=>({teks:s.a[j][1],idx:j}));
+   h+=s.a.map((p,j)=>`<label>${p[0]}<select name="q${i}_${j}"><option value="">-- Pilih pasangan --</option>${opsi.map(v=>`<option value="${v.idx}">${v.teks}</option>`).join("")}</select></label>`).join("");
+  }else if(s.t==="isian"){
+   h+='<input type="text" name="q'+i+'" placeholder="Tulis jawaban singkat">';
+  }else{
+   h+='<textarea name="q'+i+'" rows="4" placeholder="Tuliskan jawabanmu"></textarea>';
+  }
+  d.innerHTML=h;root.appendChild(d);
+ });
+ root.addEventListener("change",progres);
+ root.addEventListener("input",progres);
+}
+
+function ans(i){
+ let s=Q[i];
+ if(s.t==="pg"){
+  let x=document.querySelector(`input[name="q${i}"]:checked`);
+  return x?Number(x.value):null;
+ }
+ if(s.t==="pgk"){
+  return [...document.querySelectorAll(`input[name="q${i}"]:checked`)].map(x=>Number(x.value)).sort((a,b)=>a-b);
+ }
+ if(s.t==="match"){
+  return s.a.map((_,j)=>{
+   let x=document.querySelector(`[name="q${i}_${j}"]`);
+   return x&&x.value!==""?Number(x.value):null;
+  });
+ }
+ let x=document.querySelector(`[name="q${i}"]`);
+ return x?x.value.trim():"";
+}
+
+function progres(){
+ let n=Q.filter((s,i)=>{
+  let a=ans(i);
+  if(s.t==="pg")return a!==null;
+  if(s.t==="pgk"||s.t==="match")return a.some(v=>v!==null);
+  return a.length>0;
+ }).length;
+ $("jumlah").textContent=n;
+ $("bar").style.width=(n/40*100)+"%";
+}
+
+function setSama(a,b){return JSON.stringify(a)===JSON.stringify(b)}
+function aman(s){return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+
+function selesai(){
+ if(selesaiUjian)return;
+ if(!confirm("Yakin menyelesaikan ujian?"))return;
+ selesaiUjian=true;
+ let pg=0,pgk=0,match=0;
+ Q.forEach((s,i)=>{
+  let a=ans(i);
+  if(s.t==="pg"&&a===s.a)pg++;
+  if(s.t==="pgk"&&setSama(a,s.a.slice().sort((x,y)=>x-y)))pgk++;
+  if(s.t==="match"&&setSama(a,s.a.map((_,j)=>j)))match++;
+ });
+ let total=pg+pgk+match;
+ let nilai=Math.round(total/25*100);
+ laporan="HASIL SIAP UJI - BAB 2 CERITA TENTANG INDONESIA KITA\n"+
+ "SD Negeri Denanyar 1\nNama: "+peserta[0]+"\nNIPD: "+peserta[1]+"\n"+
+ "Tanggal: "+new Date().toLocaleString("id-ID")+"\n"+
+ "Skor objektif: "+total+"/25 ("+nilai+"%)\n"+
+ "Pilihan ganda: "+pg+"/15\nPilihan ganda kompleks: "+pgk+"/5\nMenjodohkan: "+match+"/5\n"+
+ "Isian singkat dan uraian perlu diperiksa guru.\n\nREKAP JAWABAN\n";
+ Q.forEach((s,i)=>{
+  let a=ans(i),teks="";
+  if(s.t==="pg")teks=a===null?"Belum dijawab":s.o[a];
+  else if(s.t==="pgk")teks=a.map(j=>s.o[j]).join("; ")||"Belum dijawab";
+  else if(s.t==="match")teks=s.a.map((p,j)=>p[0]+" -> "+(a[j]===null?"Kosong":s.a[a[j]][1])).join("; ");
+  else teks=a||"Belum dijawab";
+  laporan+="\n"+(i+1)+". "+s.q+"\nJawaban: "+teks+"\n";
+  if(s.t==="isian")laporan+="Kunci: "+s.a.join(" / ")+"\n";
+  if(s.t==="uraian")laporan+="Pedoman penilaian: "+s.p+"\n";
+ });
+ $("ujian").classList.add("hidden");
+ $("hasil").classList.remove("hidden");
+ $("identitasHasil").textContent=peserta[0]+" | NIPD "+peserta[1];
+ $("nilai").textContent=nilai+"%";
+ $("rincian").innerHTML=`<p>Pilihan ganda: ${pg}/15</p><p>Pilihan ganda kompleks: ${pgk}/5</p><p>Menjodohkan: ${match}/5</p><p>Isian singkat: 10 soal, perlu diperiksa guru.</p><p>Uraian: 5 soal, perlu diperiksa guru.</p>`;
+ window.scrollTo(0,0);
+}
+
+function email(){
+ if(!laporan)return;
+ $("status").textContent="Aplikasi email akan dibuka. Periksa isi pesan lalu tekan KIRIM. Email belum terkirim sebelum dikonfirmasi.";
+ const sub=encodeURIComponent("Hasil SIAP UJI Bab 2 - "+peserta[0]);
+ const body=encodeURIComponent(laporan);
+ window.location.href="mailto:danysetyanto.ds@gmail.com?subject="+sub+"&body="+body;
+}
+
+function rekap(){
+ const box=$("daftarRekap");
+ box.classList.toggle("hidden");
+ if(box.classList.contains("hidden"))return;
+ box.innerHTML="<h3>Rekap jawaban peserta</h3>";
+ Q.forEach((s,i)=>{
+  let a=ans(i),t="";
+  if(s.t==="pg")t=a===null?"Belum dijawab":s.o[a];
+  else if(s.t==="pgk")t=a.map(j=>s.o[j]).join(", ")||"Belum dijawab";
+  else if(s.t==="match")t=s.a.map((p,j)=>p[0]+" → "+(a[j]===null?"Kosong":s.a[a[j]][1])).join("; ");
+  else t=a||"Belum dijawab";
+  box.innerHTML+=`<div class="question"><b>${i+1}. ${aman(s.q)}</b><p>Jawaban: ${aman(t)}</p>${s.p?`<p class="small">Pedoman: ${aman(s.p)}</p>`:""}</div>`;
+ });
+}
+</script>
+</body>
+</html>
